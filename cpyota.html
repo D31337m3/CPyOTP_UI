@@ -1,0 +1,526 @@
+ 
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOTP Authenticator Config</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+        }
+        
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        
+        .account-list {
+            margin-top: 20px;
+        }
+        
+        .account-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .account-info {
+            flex-grow: 1;
+        }
+        
+        .account-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .account-issuer {
+            color: #718096;
+            font-size: 12px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+        
+        .qr-section {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .account-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .account-item button {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 TOTP Authenticator</h1>
+            <p>Configure your ESP32-S3 TOTP device</p>
+        </div>
+        
+        <div class="content">
+            <div id="status" class="status"></div>
+            
+            <!-- Add Account Form -->
+            <form id="addAccountForm">
+                <h3>Add New Account</h3>
+                
+                <div class="form-group">
+                    <label for="accountName">Account Name *</label>
+                    <input type="text" id="accountName" required placeholder="e.g., john@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="issuer">Issuer</label>
+                    <input type="text" id="issuer" placeholder="e.g., Google, GitHub, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="secret">Secret *</label>
+                    <input type="text" id="secret" required placeholder="Base32 encoded secret">
+                    <button type="button" class="btn" onclick="generateSecret()">Generate Random</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="digits">Digits</label>
+                    <select id="digits">
+                        <option value="6">6 digits</option>
+                        <option value="8">8 digits</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="period">Period (seconds)</label>
+                    <select id="period">
+                        <option value="30">30 seconds</option>
+                        <option value="60">60 seconds</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color">Display Color</label>
+                    <input type
+
+ <input type="color" id="color" value="#ffffff">
+                </div>
+                
+                <button type="submit" class="btn">Add Account</button>
+                <button type="button" class="btn" onclick="importFromQR()">Import QR/URI</button>
+            </form>
+            
+            <!-- QR Import Section -->
+            <div id="qrImport" class="hidden">
+                <h3>Import from QR Code or URI</h3>
+                <div class="form-group">
+                    <label for="otpauthUri">OTPAuth URI</label>
+                    <input type="text" id="otpauthUri" placeholder="otpauth://totp/...">
+                </div>
+                <button type="button" class="btn" onclick="parseOTPAuthURI()">Parse URI</button>
+                <button type="button" class="btn btn-danger" onclick="cancelImport()">Cancel</button>
+            </div>
+            
+            <!-- Account List -->
+            <div class="account-list">
+                <h3>Configured Accounts</h3>
+                <div id="accountsList"></div>
+            </div>
+            
+            <!-- Actions -->
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn" onclick="loadAccounts()">Refresh</button>
+                <button class="btn" onclick="uploadConfig()">Upload to Device</button>
+                <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let accounts = [];
+        
+        // Load accounts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAccounts();
+        });
+        
+        // Add account form handler
+        document.getElementById('addAccountForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addAccount();
+        });
+        
+        function showStatus(message, type = 'success') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+        
+        function generateSecret() {
+            // Generate random base32 secret
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            let secret = '';
+            for (let i = 0; i < 32; i++) {
+                secret += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('secret').value = secret;
+            showStatus('Random secret generated!');
+        }
+        
+        function addAccount() {
+            const name = document.getElementById('accountName').value.trim();
+            const issuer = document.getElementById('issuer').value.trim();
+            const secret = document.getElementById('secret').value.trim().toUpperCase();
+            const digits = parseInt(document.getElementById('digits').value);
+            const period = parseInt(document.getElementById('period').value);
+            const color = document.getElementById('color').value;
+            
+            if (!name || !secret) {
+                showStatus('Name and secret are required!', 'error');
+                return;
+            }
+            
+            // Validate base32 secret
+            if (!/^[A-Z2-7]+=*$/.test(secret)) {
+                showStatus('Invalid base32 secret format!', 'error');
+                return;
+            }
+            
+            // Convert color to hex number
+            const colorHex = parseInt(color.substring(1), 16);
+            
+            const account = {
+                name: name,
+                issuer: issuer,
+                secret: secret,
+                digits: digits,
+                period: period,
+                color: colorHex
+            };
+            
+            accounts.push(account);
+            updateAccountsList();
+            clearForm();
+            showStatus('Account added successfully!');
+        }
+        
+        function clearForm() {
+            document.getElementById('addAccountForm').reset();
+            document.getElementById('color').value = '#ffffff';
+        }
+        
+        function updateAccountsList() {
+            const container = document.getElementById('accountsList');
+            
+            if (accounts.length === 0) {
+                container.innerHTML = '<p style="color: #718096; text-align: center;">No accounts configured</p>';
+                return;
+            }
+            
+            container.innerHTML = accounts.map((account, index) => `
+                <div class="account-item">
+                    <div class="account-info">
+                        <div class="account-name">${escapeHtml(account.name)}</div>
+                        ${account.issuer ? `<div class="account-issuer">${escapeHtml(account.issuer)}</div>` : ''}
+                        <div style="font-size: 12px; color: #a0aec0;">
+                            ${account.digits} digits, ${account.period}s period
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="removeAccount(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+        
+        function removeAccount(index) {
+            if (confirm('Are you sure you want to remove this account?')) {
+                accounts.splice(index, 1);
+                updateAccountsList();
+                showStatus('Account removed!');
+            }
+        }
+        
+        function importFromQR() {
+            document.getElementById('qrImport').classList.remove('hidden');
+            document.getElementById('addAccountForm').classList.add('hidden');
+        }
+        
+        function cancelImport() {
+            document.getElementById('qrImport').classList.add('hidden');
+            document.getElementById('addAccountForm').classList.remove('hidden');
+            document.getElementById('otpauthUri').value = '';
+        }
+        
+        function parseOTPAuthURI() {
+            const uri = document.getElementById('otpauthUri').value.trim();
+            
+            if (!uri.startsWith('otpauth://')) {
+                showStatus('Invalid OTPAuth URI format!', 'error');
+                return;
+            }
+            
+            try {
+                const url = new URL(uri);
+                const pathParts = url.pathname.substring(1).split('/');
+                const type = pathParts[0];
+                const label = decodeURIComponent(pathParts[1] || '');
+                
+                if (type !== 'totp' && type !== 'hotp') {
+                    showStatus('Only TOTP URIs are supported!', 'error');
+                    return;
+                }
+                
+                const params = new URLSearchParams(url.search);
+                const secret = params.get('secret');
+                
+                if (!secret) {
+                    showStatus('No secret found in URI!', 'error');
+                    return;
+                }
+                
+                // Parse label (issuer:account or just account)
+                let issuer = '';
+                let name = label;
+                if (label.includes(':')) {
+                    [issuer, name] = label.split(':', 2);
+                }
+                
+                // Fill form
+                document.getElementById('accountName').value = name;
+                document.getElementById('issuer').value = issuer;
+                document.getElementById('secret').value = secret.toUpperCase();
+                document.getElementById('digits').value = params.get('digits') || '6';
+                document.getElementById('period').value = params.get('period') || '30';
+                
+                cancelImport();
+                showStatus('URI parsed successfully! Review and add the account.');
+                
+            } catch (error) {
+                showStatus('Error parsing URI: ' + error.message, 'error');
+            }
+        }
+        
+        function loadAccounts() {
+            // In a real implementation, this would load from the device
+            // For now, we'll just refresh the display
+            updateAccountsList();
+        }
+        
+        async function uploadConfig() {
+            if (accounts.length === 0) {
+                showStatus('No accounts to upload!', 'error');
+                return;
+            }
+            
+            const config = {
+                accounts: accounts
+            };
+            
+            try {
+                // Send to ESP32-S3 device
+                const response = await fetch('/upload_config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                if (response.ok) {
+                    showStatus('Configuration uploaded successfully!');
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                showStatus('Error uploading configuration: ' + error.message, 'error');
+            }
+        }
+        
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all accounts?')) {
+                accounts = [];
+                updateAccountsList();
+                showStatus('All accounts cleared!');
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Export/Import functionality
+        function exportConfig() {
+            const config = {
+                accounts: accounts,
+                exported: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(config, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'totp_config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const config = JSON.parse(e.target.result);
+                        if (config.accounts && Array.isArray(config.accounts)) {
+                            accounts = config.accounts;
+                            updateAccountsList();
+                            showStatus('Configuration imported successfully!');
+                        } else {
+                            showStatus('Invalid configuration file format!', 'error');
+                        }
+                    } catch (error) {
+                        showStatus('Error parsing configuration file!', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+    </script>
+</body>
+</html>
