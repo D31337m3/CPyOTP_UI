@@ -303,7 +303,7 @@ class TOTPAuthenticator:
 ### CPyOTP Integration
 
 ```python
-from pyotp_circuitpython import TOTP, random_base32
+from cpyotp import TOTP, random_base32
 
 # Create TOTP instance
 totp = TOTP(
