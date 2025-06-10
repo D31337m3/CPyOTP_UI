@@ -140,8 +140,8 @@ This project builds upon the excellent work of the CPyOTP library. Contributions
    # Download required libraries to /lib folder on CIRCUITPY drive
    ```
    Required libraries:
-   - `adafruit_display_text`
-   - `adafruit_display_shapes`
+   - `adafruit_display_text`   -Only needed if hardware supports display output
+   - `adafruit_display_shapes` -If not found CpyOTP_UI will just forward app launch to Console version.
    - `adafruit_requests` (for web interface)
    - `adafruit_connection_manager`
 
@@ -150,14 +150,14 @@ This project builds upon the excellent work of the CPyOTP library. Contributions
    # Clone CPyOTP repository
    git clone https://github.com/d31337m3/cpyotp.git
    ```
-   Copy `pyotp_circuitpython.py` from CPyOTP to your CircuitPython device's root directory.
+   or Copy cpyotp.py` from CPyOTP to your CircuitPython device's root directory.
 
 3. **Deploy CPYOTP_UI Files**
-   Copy all CPYOTP_UI files to your CircuitPython device:
-   - Main authenticator script
-   - Web interface files
-   - Configuration templates
-   - Supporting utilities
+   Copy all CPYOTP_UI files to your CircuitPython device "/" or "/lib" directory:
+   -/cpyotp_main.py        - Main authenticator app , run this fie to start manually.
+   -/cpyotp_serv.py        - Web interface server
+   -/cpyotp_install.py        - Simple installer for creating required directory structure etc (mostly for future use with next release)
+   -/cpyotp_console.py     - Console Interface for Usage and Configuration directly from the REPL prompt etc, no display needed to run this program.
 
 4. **Hardware Setup**
    Connect your TFT display according to your board's pinout configuration.
