@@ -1,4 +1,4 @@
-# CPy TOTP Authenticator User front END  (CpyOTP_UI)
+# CPy-TOTP Authenticator User front end  (CpyOTP_UI)
 
 A comprehensive TOTP (Time-based One-Time Password) authenticator system for ESP32-S3 microcontrollers with display support. This project provides a secure, offline 2FA solution with both display interface and web-based management.
 
