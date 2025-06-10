@@ -877,13 +877,13 @@ jobs:
 ## Future Roadmap
 
 ### Planned Features
-- [ ] **Encrypted Storage**: AES encryption for configuration files
-- [ ] **Biometric Authentication**: Fingerprint sensor integration
-- [ ] **Bluetooth Sync**: Mobile app synchronization
-- [ ] **Voice Alerts**: Audio feedback for code expiration
+- [ ] **Encrypted Storage**: AES encryption for configuration files. Easily addable in handfull of code lines.
+- [ ] **Biometric Authentication**: Fingerprint sensor integration via mobile app (prior to syncing, reset, config changes)
+- [ ] **Bluetooth Sync**: Mobile app synchronization with hardware device
+- [ ] **Audible Alerts**: Audio feedback for code expiration
 - [ ] **Multi-Language**: Internationalization support
-- [ ] **Cloud Backup**: Secure cloud configuration backup
-- [ ] **Hardware Security**: TPM/secure element integration
+- [ ] **Cloud Backup**: Secure cloud configuration backup, to users own cloud service provider (ie: Dropbox, Google Drive etc.)
+- [ ] **Hardware Security**: TPM/secure element integration, ESP32 Firmware encryption mode 
 
 ### Version 2.0 Goals
 - Enhanced security with hardware encryption
@@ -893,10 +893,10 @@ jobs:
 - Multi-device synchronization
 
 ### Community Contributions
-We welcome contributions in the following areas:
-- Additional display drivers
+We welcome ANY and ALL contributions, especially in the following areas:
+- Additional display testing with diffrent sized displays.
 - New authentication methods (HOTP, Steam Guard)
-- Mobile applications
+- Mobile applications (Andoid , iOS)
 - Documentation improvements
 - Testing and bug reports
 
@@ -904,7 +904,7 @@ We welcome contributions in the following areas:
 
 **Project Status**: Active Development  
 **Current Version**: 1.0.0  
-**Last Updated**: 2024  
+**Last Updated**: 2025 June 9  
 **Maintainer**: D31337m3 / Devin Ranger 
 
 For the latest updates and documentation, visit our [GitHub repository](https://github.com/d31337m3/cpyotp_ui).
